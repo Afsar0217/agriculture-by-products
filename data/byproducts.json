@@ -1,0 +1,10 @@
+{
+  "orange_peel": {
+    "Microwave-Assisted Drying": ["Flavor powder", "Natural preservatives"],
+    "Freeze-Drying": ["Aroma enhancer", "Fiber additive"]
+  },
+  "banana_peel": {
+    "Spray Drying": ["Potassium-rich powder"],
+    "Hot-Air Drying": ["Compost enhancer", "Animal feed"]
+  }
+}

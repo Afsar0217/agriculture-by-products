@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ByProduct Genie</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        
+        .hidden { display: none; }
+        #infoModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            text-align: center;
+        }
+        .modal-content img {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 15px;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        #sampleToggleBtn {
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🧪 INNOVATIVE USE OF AGRICULTURAL BY-PRODUCTS IN THE FOOD SECTOR</h1>
+<form method="post" enctype="multipart/form-data">
+    <label><strong>Upload Image of Agricultural Waste</strong></label>
+    <input type="file" name="image" required>
+
+    <label><strong>Select Processing Method</strong></label>
+    <select name="process" required>
+        <option value="" disabled selected>Choose a method</option>
+        <option>Microwave-Assisted Drying</option>
+        <option>Freeze-Drying</option>
+        <option>Spray Drying</option>
+        <option>Hot-Air Drying</option>
+    </select>
+
+    <input type="submit" value="Analyze">
+</form>
+
+{% if result %}
+<h2>🌿 Potential By-Products:</h2>
+<div class="output-container">
+    {% for item in result %}
+        <div class="output-card" onclick="getByProductInfo('{{ item }}')">{{ item }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Toggle Button -->
+<button id="sampleToggleBtn" onclick="toggleSampleTable()">Show/Hide Sample Inputs</button>
+
+<!-- Sample Input Table -->
+<div id="sampleInputsTable" class="hidden">
+    <h2>🧪 Sample Inputs</h2>
+    <table border="1" style="border-collapse: collapse; margin: 20px auto; width: 90%;">
+        <thead>
+            <tr>
+                <th>Image Name</th>
+                <th>Process</th>
+                <th>Outputs</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sample in samples %}
+            <tr>
+                <td>{{ sample.filename }}</td>
+<td>{{ sample.process }}</td>
+<td>
+    <ul style="padding-left: 15px; text-align: left;">
+        {% for out in sample.output %}
+        <li onclick="getByProductInfo('{{ out }}')" style="cursor:pointer; color: #007bff;">
+            {{ out }}
+        </li>
+        {% endfor %}
+    </ul>
+</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Popup Modal -->
+<div id="infoModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle">By-Product Info</h3>
+        <img id="modalImage" src="" alt="" />
+        <p id="modalContent">Loading...</p>
+    </div>
+</div>
+
+<script>
+function getByProductInfo(name) {
+    document.getElementById("infoModal").style.display = "flex";
+    document.getElementById("modalTitle").innerText = name;
+    document.getElementById("modalContent").innerText = "Loading info...";
+    const imgEl = document.getElementById("modalImage");
+    imgEl.style.display = "none";
+
+    fetch(`/info?name=${encodeURIComponent(name)}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("modalContent").innerText = data.info || "No info found.";
+            if (data.image) {
+                imgEl.src = data.image;
+                imgEl.style.display = "block";
+            }
+        })
+        .catch(() => {
+            document.getElementById("modalContent").innerText = "Failed to load info.";
+        });
+}
+
+function closeModal() {
+    document.getElementById("infoModal").style.display = "none";
+}
+
+function toggleSampleTable() {
+    const table = document.getElementById("sampleInputsTable");
+    table.classList.toggle("hidden");
+}
+</script>
+
+</body>
+</html>
